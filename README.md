@@ -96,14 +96,11 @@ Create `data/locators.xlsx` with the following structure:
 
 Create `data/testdata.xlsx` with the following structure:
 
-| ScenarioName              | ElementName | TestData              | DataType |
-|---------------------------|-------------|----------------------|----------|
-| Successful login          | username    | testuser@example.com  | string   |
-| Successful login          | password    | password123           | string   |
-| Failed login              | username    | invaliduser           | string   |
-| Failed login              | password    | wrongpassword         | string   |
-| Registration scenario     | email       | newuser@example.com   | string   |
-| Registration scenario     | firstName   | John                  | string   |
+| ScenarioName          | username              | password            | email                | firstName |
+|---------------------- |---------------------- |-------------------- |----------------------|-----------|
+| Successful login      | testuser@example.com  | password123         | -                    | -         |
+| Failed login          | invaliduser           | wrongpassword       | -                    | -         |
+| Registration scenario | -                     | -                   | newuser@example.com  | John      |
 
 ## ✍️ Writing Feature Files
 

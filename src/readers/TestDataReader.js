@@ -4,17 +4,22 @@ import configManager from '../config/ConfigurationManager.js';
 
 /**
  * Structure of Test Data Excel file:
- * Columns: ScenarioName | ElementName | TestData | DataType(optional)
+ * First column: ScenarioName
+ * Other columns: Element names (dynamically)
+ * Each row: One scenario with all its test data
+ * 
  * Example:
- * LoginScenario | username | testuser@example.com | string
- * LoginScenario | password | password123 | string
- * RegisterScenario | email | newuser@example.com | string
+ * | ScenarioName | username | password | email |
+ * |---|---|---|---|
+ * | Login Scenario | testuser | password123 | - |
+ * | Register Scenario | - | - | newuser@example.com |
  */
 
 class TestDataReader {
   constructor(filePath = null) {
     this.filePath = filePath || configManager.get('testDataPath');
     this.testData = new Map(); // Map<ScenarioName, Map<ElementName, TestDataObject>>
+    this.headers = []; // Array of column headers (element names)
     this.loaded = false;
   }
 
@@ -37,17 +42,22 @@ class TestDataReader {
 
       // Read header row
       const headerRow = worksheet.getRow(1);
-      const headers = {};
+      const headerValues = [];
       headerRow.eachCell((cell, colNumber) => {
-        headers[cell.value?.toLowerCase() || ''] = colNumber;
+        const headerValue = cell.value?.trim() || '';
+        headerValues.push({ colNumber, value: headerValue });
       });
 
-      // Validate required columns
-      const requiredColumns = ['scenarioname', 'elementname', 'testdata'];
-      const missingColumns = requiredColumns.filter(col => !headers[col]);
-      
-      if (missingColumns.length > 0) {
-        throw new Error(`Missing required columns: ${missingColumns.join(', ')}`);
+      // Validate that first column is ScenarioName
+      if (headerValues.length === 0 || headerValues[0].value.toLowerCase() !== 'scenarioname') {
+        throw new Error('First column must be "ScenarioName"');
+      }
+
+      // Store element names (all columns except first one)
+      this.headers = headerValues.slice(1).map(h => h.value).filter(h => h !== '');
+
+      if (this.headers.length === 0) {
+        throw new Error('No element columns found. Please add element names as column headers.');
       }
 
       // Parse test data rows
@@ -55,31 +65,42 @@ class TestDataReader {
       worksheet.eachRow((row, rowNumber) => {
         if (rowNumber === 1) return; // Skip header
 
-        const scenarioName = row.getCell(headers['scenarioname']).value?.trim();
-        const elementName = row.getCell(headers['elementname']).value?.trim();
-        const testData = row.getCell(headers['testdata']).value;
-        const dataType = row.getCell(headers['datatype'])?.value?.trim() || typeof testData;
+        const scenarioName = row.getCell(1).value?.trim();
 
-        if (scenarioName && elementName && testData !== null && testData !== undefined) {
-          const dataObj = {
-            scenarioName,
-            elementName,
-            testData,
-            dataType,
-            rowNumber,
-          };
+        if (scenarioName) {
+          // Create map for this scenario
+          const scenarioDataMap = new Map();
 
-          if (!this.testData.has(scenarioName)) {
-            this.testData.set(scenarioName, new Map());
+          // Read data for each element column
+          headerValues.forEach((header, index) => {
+            if (index === 0) return; // Skip ScenarioName column
+
+            const elementName = header.value;
+            const testData = row.getCell(header.colNumber).value;
+
+            // Store test data if not empty
+            if (testData !== null && testData !== undefined && testData !== '') {
+              scenarioDataMap.set(elementName, {
+                scenarioName,
+                elementName,
+                testData,
+                dataType: typeof testData,
+                rowNumber,
+              });
+            }
+          });
+
+          // Add to main test data map
+          if (scenarioDataMap.size > 0) {
+            this.testData.set(scenarioName, scenarioDataMap);
+            rowCount++;
           }
-
-          this.testData.get(scenarioName).set(elementName, dataObj);
-          rowCount++;
         }
       });
 
       this.loaded = true;
-      logger.info(`Successfully loaded ${rowCount} test data entries from ${this.filePath}`);
+      logger.info(`Successfully loaded ${rowCount} scenarios from ${this.filePath}`);
+      logger.info(`Available element columns: ${this.headers.join(', ')}`);
       
     } catch (error) {
       logger.error(`Failed to load test data: ${error.message}`, { error });
@@ -159,15 +180,11 @@ class TestDataReader {
   }
 
   /**
-   * Get test data count
-   * @returns {number} Total number of test data entries
+   * Get test data count (counts scenarios, not individual entries)
+   * @returns {number} Total number of scenarios
    */
   getTestDataCount() {
-    let count = 0;
-    for (const scenarioMap of this.testData.values()) {
-      count += scenarioMap.size;
-    }
-    return count;
+    return this.testData.size;
   }
 }
 

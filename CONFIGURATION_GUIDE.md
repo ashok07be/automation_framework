@@ -302,14 +302,29 @@ Timeout: 15000-30000
 
 File: `data/testdata.xlsx`
 
+### Structure
+
+The test data Excel file uses a **header-based structure** where:
+- **First column**: Always `ScenarioName`
+- **Other columns**: Element names (dynamically defined)
+- **Each row**: One scenario with all its test data
+
+### Example Excel Layout
+
+```
+| ScenarioName | username | password | email |
+|---|---|---|---|
+| Login Test | testuser | password123 | - |
+| Admin Login | admin | secures@123 | - |
+| Registration | - | - | newuser@example.com |
+```
+
 ### Required Columns
 
 | Column | Description | Example |
 |--------|-------------|---------|
-| ScenarioName | Name of scenario | Login Scenario |
-| ElementName | Name of element | username |
-| TestData | The actual data | testuser@example.com |
-| DataType | Type of data | string, number, boolean |
+| ScenarioName | Name of scenario (1st column, mandatory) | Login Test |
+| Element Columns | All other columns are element names | username, password, email, etc. |
 
 ### Scenario Name Matching
 
@@ -317,41 +332,48 @@ Scenario name in feature file MUST match exactly:
 
 ```gherkin
 Feature: Login
-  Scenario: Successful login test
+  Scenario: Login Test
+    Given NAVIGATE TO "/login"
+    When FILL "username"
+    And FILL "password"
     ...
 ```
 
-Excel:
-```
-ScenarioName: Successful login test
-```
+Excel first column value MUST be: `Login Test`
 
 ### Test Data Types
 
-```excel
-TestData | DataType | Description
-123      | number   | Numeric value
-true     | boolean  | Boolean value
-test@ex  | string   | Text value
-12/25/24 | date     | Date format
+Excel automatically handles data types:
+
+```
+| ScenarioName | age | active | email | date |
+|---|---|---|---|---|
+| Test Scenario | 25 | true | user@example.com | 12/25/2024 |
 ```
 
-### Using Environment Variables in Test Data
+Types are automatically detected: number, boolean, string, date
 
-```env
-# In .env
-TEST_USER_EMAIL=testuser@example.com
-TEST_PASSWORD=SecurePass123
+### Using Empty Cells
+
+Use empty cells (or `-`) when an element doesn't need data for a scenario:
+
+```
+| ScenarioName | username | password | email |
+|---|---|---|---|
+| Login Test | testuser | password123 | - |
+| Registration | - | - | newuser@example.com |
 ```
 
-### Reusing Test Data
+### Multiple Scenarios with Same Elements
 
-If same data used in multiple scenarios, create separate rows:
+Each row represents one complete scenario:
 
-```excel
-ScenarioName | ElementName | TestData
-Scenario A   | email       | user@example.com
-Scenario B   | email       | user@example.com
+```
+| ScenarioName | email | password |
+|---|---|---|
+| Scenario A | user@example.com | pass123 |
+| Scenario B | another@example.com | pass456 |
+| Scenario C | third@example.com | pass789 |
 ```
 
 ---

@@ -47,13 +47,14 @@ Example:
 
 Edit `data/testdata.xlsx`:
 - Add your test scenarios
-- Add test data for each element
+- Add test data for each element as column headers
+- Each row represents one scenario with its test data
 
 Example:
-| ScenarioName | ElementName | TestData |
+| ScenarioName | username | password |
 |---|---|---|
-| Login Test | username | testuser |
-| Login Test | password | password123 |
+| Login Test | testuser | password123 |
+| Admin Login Test | admin | admin@123 |
 
 ## Step 6: Write Feature Files
 
