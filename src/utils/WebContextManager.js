@@ -19,6 +19,7 @@ class WebContextManager {
       const browserLaunchOptions = {
         headless: !configManager.get('headed'),
         slowMo: configManager.get('slowMo', 0),
+        channel: 'chrome',
       };
 
       if (configManager.get('debug')) {

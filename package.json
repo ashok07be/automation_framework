@@ -5,30 +5,31 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "cucumber-js",
-    "test:chrome": "BROWSER=chromium cucumber-js",
-    "test:firefox": "BROWSER=firefox cucumber-js",
-    "test:webkit": "BROWSER=webkit cucumber-js",
-    "test:headed": "HEADED=true cucumber-js",
-    "test:debug": "DEBUG=true cucumber-js",
+    "test": "cucumber-js --import src/steps/**/*.js",
+    "test:chrome": "BROWSER=chromium cucumber-js --import src/steps/**/*.js",
+    "test:firefox": "BROWSER=firefox cucumber-js --import src/steps/**/*.js",
+    "test:webkit": "BROWSER=webkit cucumber-js --import src/steps/**/*.js",
+    "test:headed": "HEADED=true cucumber-js --import src/steps/**/*.js",
+    "test:debug": "DEBUG=true cucumber-js --import src/steps/**/*.js",
     "test:report": "node generateReport.js",
     "setup": "node scripts/createSampleData.js",
     "lint": "eslint src/",
     "format": "prettier --write src/ features/"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^9.5.1",
-    "@playwright/test": "^1.40.0",
-    "playwright": "^1.40.0",
+    "@cucumber/cucumber": "^10.0.0",
+    "@playwright/test": "^1.45.0",
+    "playwright": "^1.45.0",
     "exceljs": "^4.4.0",
-    "dotenv": "^16.3.1",
-    "winston": "^3.11.0",
-    "moment": "^2.29.4"
+    "dotenv": "^16.4.5",
+    "winston": "^3.13.0",
+    "dayjs": "^1.11.11"
   },
   "devDependencies": {
-    "@types/node": "^20.10.0",
-    "eslint": "^8.55.0",
-    "prettier": "^3.1.1"
+    "@eslint/js": "^9.0.0",
+    "@types/node": "^20.14.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.3.0"
   },
   "keywords": [
     "playwright",

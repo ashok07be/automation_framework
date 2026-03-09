@@ -4,7 +4,7 @@ Feature: User Login Scenarios
   So that I can access my account
 
   Scenario: Successful login with valid credentials
-    Given NAVIGATE TO "/login"
+    Given NAVIGATE TO "/"
     When FILL "username"
     And FILL "password"
     And CLICK "loginBtn"
@@ -12,12 +12,12 @@ Feature: User Login Scenarios
     And VERIFY ELEMENT "dashboardHeader" IS VISIBLE
 
   Scenario: Failed login with invalid credentials
-    Given NAVIGATE TO "/login"
+    Given NAVIGATE TO "/"
     When FILL "username" WITH "invaliduser"
     And FILL "password" WITH "wrongpassword"
     And CLICK "loginBtn"
     Then VERIFY TEXT "Invalid credentials"
 
   Scenario: Login button should be enabled
-    Given NAVIGATE TO "/login"
+    Given NAVIGATE TO "/"
     Then VERIFY ELEMENT "loginBtn" EXISTS

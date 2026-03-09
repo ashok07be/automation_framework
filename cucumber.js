@@ -1,7 +1,5 @@
-module.exports = {
+export default {
   default: {
-    require: ['src/steps/**/*.js'],
-    requireModule: ['@babel/register'],
     format: [
       'progress-bar',
       'html:reports/cucumber-report.html',
