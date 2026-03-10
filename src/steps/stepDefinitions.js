@@ -206,8 +206,9 @@ Then(/^VERIFY ELEMENT "([^"]*)" IS VISIBLE$/, async function (elementName) {
   try {
     logger.info(`[Step] VERIFY ELEMENT "${elementName}" IS VISIBLE`);
 
-    // Get locator for the element
-    const locatorObj = this.locatorReader.getLocator('LoginPage', elementName); // Default page, can be enhanced
+    // Get locator for the element - use DashboardPage for dashboard elements
+    const pageName = elementName.includes('dashboard') ? 'DashboardPage' : 'LoginPage';
+    const locatorObj = this.locatorReader.getLocator(pageName, elementName);
 
     await this.actionManager.assertAction.assertElementVisible(locatorObj);
 
@@ -225,8 +226,9 @@ Then(/^VERIFY ELEMENT "([^"]*)" EXISTS$/, async function (elementName) {
   try {
     logger.info(`[Step] VERIFY ELEMENT "${elementName}" EXISTS`);
 
-    // Get locator for the element
-    const locatorObj = this.locatorReader.getLocator('LoginPage', elementName); // Default page, can be enhanced
+    // Get locator for the element - use DashboardPage for dashboard elements
+    const pageName = elementName.includes('dashboard') ? 'DashboardPage' : 'LoginPage';
+    const locatorObj = this.locatorReader.getLocator(pageName, elementName);
 
     await this.actionManager.assertAction.assertElementExists(locatorObj);
 

@@ -18,3 +18,16 @@ Feature: Dashboard Functionality
     When SELECT "reportTypeDropdown" WITH "Monthly"
     And WAIT FOR "2" SECONDS
     Then VERIFY ELEMENT "reportTable" IS VISIBLE
+  Scenario: Failed login with invalid credentials
+    Given NAVIGATE TO "/"
+    When FILL "username" WITH "invaliduser"
+    And FILL "password" WITH "wrongpassword"
+    And CLICK "loginBtn"
+    Then VERIFY TEXT "Invalid credentials"
+
+  Scenario: Login button should be enabled
+    Given NAVIGATE TO "/"
+    Then VERIFY ELEMENT "loginBtn" EXISTS
+
+    #Then VERIFY TEXT "Dashboard"#
+    And VERIFY ELEMENT "dashboardHeader" IS VISIBLE

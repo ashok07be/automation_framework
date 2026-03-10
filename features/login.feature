@@ -8,7 +8,7 @@ Feature: User Login Scenarios
     When FILL "username"
     And FILL "password"
     And CLICK "loginBtn"
-    Then VERIFY TEXT "Dashboard"
+    Then VERIFY TEXT "Products"
     And VERIFY ELEMENT "dashboardHeader" IS VISIBLE
 
   Scenario: Failed login with invalid credentials
@@ -16,8 +16,9 @@ Feature: User Login Scenarios
     When FILL "username" WITH "invaliduser"
     And FILL "password" WITH "wrongpassword"
     And CLICK "loginBtn"
-    Then VERIFY TEXT "Invalid credentials"
+    Then VERIFY TEXT "Epic sadface"
 
   Scenario: Login button should be enabled
     Given NAVIGATE TO "/"
     Then VERIFY ELEMENT "loginBtn" EXISTS
+    

@@ -24,14 +24,14 @@ async function createLocatorsFile() {
     { header: 'parent', key: 'parent', width: 20 },
   ];
 
-  // Add sample data
+  // Add sample data for SauceDemo
   const locatorData = [
     // Login Page
     {
       pagename: 'LoginPage',
       elementname: 'username',
       locatorstrategy: 'id',
-      locatorvalue: 'user_input',
+      locatorvalue: 'user-name',
       timeout: 10000,
       iframe: '',
       parent: '',
@@ -40,7 +40,7 @@ async function createLocatorsFile() {
       pagename: 'LoginPage',
       elementname: 'password',
       locatorstrategy: 'id',
-      locatorvalue: 'password_input',
+      locatorvalue: 'password',
       timeout: 10000,
       iframe: '',
       parent: '',
@@ -48,17 +48,8 @@ async function createLocatorsFile() {
     {
       pagename: 'LoginPage',
       elementname: 'loginBtn',
-      locatorstrategy: 'xpath',
-      locatorvalue: "//button[@type='submit']",
-      timeout: 10000,
-      iframe: '',
-      parent: '',
-    },
-    {
-      pagename: 'LoginPage',
-      elementname: 'rememberMe',
-      locatorstrategy: 'css',
-      locatorvalue: "input[type='checkbox']",
+      locatorstrategy: 'id',
+      locatorvalue: 'login-button',
       timeout: 10000,
       iframe: '',
       parent: '',
@@ -67,17 +58,17 @@ async function createLocatorsFile() {
       pagename: 'LoginPage',
       elementname: 'errorMessage',
       locatorstrategy: 'css',
-      locatorvalue: '.error-message',
+      locatorvalue: '.error-message-container',
       timeout: 5000,
       iframe: '',
       parent: '',
     },
-    // Dashboard Page
+    // Dashboard Page (Inventory)
     {
       pagename: 'DashboardPage',
       elementname: 'dashboardHeader',
-      locatorstrategy: 'xpath',
-      locatorvalue: "//h1[text()='Dashboard']",
+      locatorstrategy: 'css',
+      locatorvalue: '.inventory_container',
       timeout: 15000,
       iframe: '',
       parent: '',
@@ -85,8 +76,8 @@ async function createLocatorsFile() {
     {
       pagename: 'DashboardPage',
       elementname: 'userMenuBtn',
-      locatorstrategy: 'css',
-      locatorvalue: '.user-menu-btn',
+      locatorstrategy: 'id',
+      locatorvalue: 'react-burger-menu-btn',
       timeout: 10000,
       iframe: '',
       parent: '',
@@ -94,8 +85,8 @@ async function createLocatorsFile() {
     {
       pagename: 'DashboardPage',
       elementname: 'logoutBtn',
-      locatorstrategy: 'text',
-      locatorvalue: 'Logout',
+      locatorstrategy: 'id',
+      locatorvalue: 'logout_sidebar_link',
       timeout: 10000,
       iframe: '',
       parent: '',
@@ -103,8 +94,8 @@ async function createLocatorsFile() {
     {
       pagename: 'DashboardPage',
       elementname: 'reportTypeDropdown',
-      locatorstrategy: 'id',
-      locatorvalue: 'report_type_select',
+      locatorstrategy: 'css',
+      locatorvalue: '.product_sort_container select',
       timeout: 10000,
       iframe: '',
       parent: '',
@@ -113,28 +104,9 @@ async function createLocatorsFile() {
       pagename: 'DashboardPage',
       elementname: 'reportTable',
       locatorstrategy: 'css',
-      locatorvalue: 'table.reports-table',
+      locatorvalue: '.inventory_list',
       timeout: 15000,
       iframe: '',
-      parent: '',
-    },
-    // Modal with iframe
-    {
-      pagename: 'ConfirmationModal',
-      elementname: 'confirmButton',
-      locatorstrategy: 'xpath',
-      locatorvalue: "//button[text()='Confirm']",
-      timeout: 10000,
-      iframe: '#confirmModal',
-      parent: '',
-    },
-    {
-      pagename: 'ConfirmationModal',
-      elementname: 'modalMessage',
-      locatorstrategy: 'css',
-      locatorvalue: '.modal-body-text',
-      timeout: 10000,
-      iframe: '#confirmModal',
       parent: '',
     },
   ];
@@ -157,75 +129,33 @@ async function createTestDataFile() {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('TestData');
 
-  // Add headers
+  // Add headers - ScenarioName first, then element names
   worksheet.columns = [
-    { header: 'ScenarioName', key: 'scenarioname', width: 30 },
-    { header: 'ElementName', key: 'elementname', width: 20 },
-    { header: 'TestData', key: 'testdata', width: 40 },
-    { header: 'DataType', key: 'datatype', width: 15 },
+    { header: 'ScenarioName', key: 'scenarioName', width: 30 },
+    { header: 'username', key: 'username', width: 20 },
+    { header: 'password', key: 'password', width: 20 },
+    { header: 'reportTypeDropdown', key: 'reportTypeDropdown', width: 20 },
   ];
 
-  // Add sample data
+  // Add sample data - one row per scenario
   const testData = [
-    // Successful login scenario
     {
-      scenarioname: 'Successful login with valid credentials',
-      elementname: 'username',
-      testdata: 'testuser@example.com',
-      datatype: 'string',
+      scenarioName: 'Successful login with valid credentials',
+      username: 'standard_user',
+      password: 'secret_sauce',
+      reportTypeDropdown: '',
     },
     {
-      scenarioname: 'Successful login with valid credentials',
-      elementname: 'password',
-      testdata: 'Password123!',
-      datatype: 'string',
-    },
-    // Failed login scenario
-    {
-      scenarioname: 'Failed login with invalid credentials',
-      elementname: 'username',
-      testdata: 'invaliduser@example.com',
-      datatype: 'string',
+      scenarioName: 'Failed login with invalid credentials',
+      username: 'invaliduser',
+      password: 'wrongpassword',
+      reportTypeDropdown: '',
     },
     {
-      scenarioname: 'Failed login with invalid credentials',
-      elementname: 'password',
-      testdata: 'wrongpassword',
-      datatype: 'string',
-    },
-    // Login scenario
-    {
-      scenarioname: 'Successful login',
-      elementname: 'username',
-      testdata: 'testuser@example.com',
-      datatype: 'string',
-    },
-    {
-      scenarioname: 'Successful login',
-      elementname: 'password',
-      testdata: 'Password123!',
-      datatype: 'string',
-    },
-    // Dashboard scenario
-    {
-      scenarioname: 'Navigate to dashboard and verify elements',
-      elementname: 'none',
-      testdata: 'N/A',
-      datatype: 'string',
-    },
-    // Logout scenario
-    {
-      scenarioname: 'User can logout successfully',
-      elementname: 'none',
-      testdata: 'N/A',
-      datatype: 'string',
-    },
-    // Report selection scenario
-    {
-      scenarioname: 'Verify table data with dropdown selection',
-      elementname: 'reportTypeDropdown',
-      testdata: 'Monthly',
-      datatype: 'string',
+      scenarioName: 'Verify table data with dropdown selection',
+      username: '',
+      password: '',
+      reportTypeDropdown: 'Monthly',
     },
   ];
 
