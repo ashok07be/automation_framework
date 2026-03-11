@@ -24,6 +24,7 @@ let currentScenarioName;
  */
 function getPageName(elementName) {
   const lower = elementName.toLowerCase();
+  // high‑level page categories based on element naming conventions
   if (lower.includes('dashboard') || lower.includes('productitem') || lower.includes('cartlink') || lower.includes('addtocart')) {
     return 'DashboardPage';
   }
@@ -35,9 +36,38 @@ function getPageName(elementName) {
   ) {
     return 'CheckoutPage';
   }
+  // initial or landing screen elements
+  if (lower.includes('getstarted') || lower.includes('courses')) {
+    return 'InitialPage';
+  }
+  // login button on course page
+  if (lower === 'loginbtn') {
+    return 'CoursePage';
+  }
   // fallback
   return 'LoginPage';
 }
+
+/**
+ * Resolve locator with a fallback across all pages.  Helps avoid failures when
+ * the automatic page inference is slightly off (e.g. element defined on
+ * InitialPage but called before mapping updated).
+ */
+function resolveLocator(reader, elementName) {
+  const pageName = getPageName(elementName);
+  try {
+    return reader.getLocator(pageName, elementName);
+  } catch (err) {
+    // scan other pages for the element
+    for (const page of reader.getPages()) {
+      if (reader.hasLocator(page, elementName)) {
+        logger.warn(`Element '${elementName}' not found on ${pageName}, using locator from ${page}`);
+        return reader.getLocator(page, elementName);
+      }
+    }
+    throw err;
+  }
+} 
 
 /**
  * Before Hook - Runs before each scenario
@@ -144,9 +174,8 @@ When(/^FILL "([^"]*)"(?: WITH "([^"]*)")?$/, async function (elementName, explic
   try {
     logger.info(`[Step] FILL "${elementName}"`);
 
-    // Get locator for the element
-    const pageName = getPageName(elementName);
-    const locatorObj = this.locatorReader.getLocator(pageName, elementName);
+    // Get locator for the element (with resolver fallback)
+    const locatorObj = resolveLocator(this.locatorReader, elementName);
 
     let value = explicitValue;
 
@@ -175,9 +204,8 @@ When(/^CLICK "([^"]*)"$/, async function (elementName) {
   try {
     logger.info(`[Step] CLICK "${elementName}"`);
 
-    // Get locator for the element
-    const pageName = getPageName(elementName);
-    const locatorObj = this.locatorReader.getLocator(pageName, elementName);
+    // Get locator for the element (with resolver fallback)
+    const locatorObj = resolveLocator(this.locatorReader, elementName);
 
     await this.actionManager.clickAction.click(locatorObj);
 
@@ -195,9 +223,8 @@ When(/^SELECT "([^"]*)" WITH "([^"]*)"$/, async function (elementName, optionVal
   try {
     logger.info(`[Step] SELECT "${elementName}" WITH "${optionValue}"`);
 
-    // Get locator for the element
-    const pageName = getPageName(elementName);
-    const locatorObj = this.locatorReader.getLocator(pageName, elementName); // Default page, can be enhanced
+    // Get locator for the element (use resolver helper)
+    const locatorObj = resolveLocator(this.locatorReader, elementName); // Default page, can be enhanced
 
     await this.actionManager.selectAction.selectByValue(locatorObj, optionValue);
 

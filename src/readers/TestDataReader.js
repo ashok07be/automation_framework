@@ -76,7 +76,12 @@ class TestDataReader {
             if (index === 0) return; // Skip ScenarioName column
 
             const elementName = header.value;
-            const testData = row.getCell(header.colNumber).value;
+            let testData = row.getCell(header.colNumber).value;
+
+            // ExcelJS returns hyperlink objects for cells with links
+            if (testData && typeof testData === 'object' && 'text' in testData) {
+              testData = testData.text;
+            }
 
             // Store test data if not empty
             if (testData !== null && testData !== undefined && testData !== '') {

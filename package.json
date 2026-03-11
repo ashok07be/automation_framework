@@ -9,7 +9,7 @@
     "test:chrome": "$env:BROWSER='chromium'; cucumber-js --import src/steps/**/*.js",
     "test:firefox": "$env:BROWSER='firefox'; cucumber-js --import src/steps/**/*.js",
     "test:webkit": "$env:BROWSER='webkit'; cucumber-js --import src/steps/**/*.js",
-    "test:headed": "$env:HEADED='true'; cucumber-js --import src/steps/**/*.js",
+    "test:headed": "cross-env HEADED=true cucumber-js --import src/steps/**/*.js",
     "test:debug": "$env:DEBUG='true'; cucumber-js --import src/steps/**/*.js",
     "test:report": "node generateReport.js",
     "setup": "node scripts/createSampleData.js",
