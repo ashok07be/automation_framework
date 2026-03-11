@@ -18,6 +18,28 @@ let actionManager;
 let currentScenarioName;
 
 /**
+ * Determine page name for a given element.  The default used to be hardcoded
+ * to LoginPage for most actions; this helper lets us route to other pages
+ * (DashboardPage, CartPage, CheckoutPage) based on element naming conventions.
+ */
+function getPageName(elementName) {
+  const lower = elementName.toLowerCase();
+  if (lower.includes('dashboard') || lower.includes('productitem') || lower.includes('cartlink') || lower.includes('addtocart')) {
+    return 'DashboardPage';
+  }
+  if (lower.includes('checkoutbtn')) {
+    return 'CartPage';
+  }
+  if (
+    ['firstname', 'lastname', 'postalcode', 'continuebtn', 'finishbtn'].some(e => lower.includes(e))
+  ) {
+    return 'CheckoutPage';
+  }
+  // fallback
+  return 'LoginPage';
+}
+
+/**
  * Before Hook - Runs before each scenario
  * Initializes browser, loads locators and test data
  */
@@ -123,7 +145,8 @@ When(/^FILL "([^"]*)"(?: WITH "([^"]*)")?$/, async function (elementName, explic
     logger.info(`[Step] FILL "${elementName}"`);
 
     // Get locator for the element
-    const locatorObj = this.locatorReader.getLocator('LoginPage', elementName); // Default page, can be enhanced
+    const pageName = getPageName(elementName);
+    const locatorObj = this.locatorReader.getLocator(pageName, elementName);
 
     let value = explicitValue;
 
@@ -153,7 +176,8 @@ When(/^CLICK "([^"]*)"$/, async function (elementName) {
     logger.info(`[Step] CLICK "${elementName}"`);
 
     // Get locator for the element
-    const locatorObj = this.locatorReader.getLocator('LoginPage', elementName); // Default page, can be enhanced
+    const pageName = getPageName(elementName);
+    const locatorObj = this.locatorReader.getLocator(pageName, elementName);
 
     await this.actionManager.clickAction.click(locatorObj);
 
@@ -172,7 +196,8 @@ When(/^SELECT "([^"]*)" WITH "([^"]*)"$/, async function (elementName, optionVal
     logger.info(`[Step] SELECT "${elementName}" WITH "${optionValue}"`);
 
     // Get locator for the element
-    const locatorObj = this.locatorReader.getLocator('LoginPage', elementName); // Default page, can be enhanced
+    const pageName = getPageName(elementName);
+    const locatorObj = this.locatorReader.getLocator(pageName, elementName); // Default page, can be enhanced
 
     await this.actionManager.selectAction.selectByValue(locatorObj, optionValue);
 

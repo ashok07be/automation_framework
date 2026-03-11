@@ -22,3 +22,27 @@ Feature: User Login Scenarios
     Given NAVIGATE TO "/"
     Then VERIFY ELEMENT "loginBtn" EXISTS
     
+  Scenario: Access dashboard after successful login
+    Given NAVIGATE TO "/"
+    When FILL "username"
+    And FILL "password"
+    And CLICK "loginBtn"
+    Then VERIFY ELEMENT "dashboardHeader" IS VISIBLE
+    And VERIFY TEXT "Products"
+
+  Scenario: End-to-end purchase flow
+    Given NAVIGATE TO "/"
+    When FILL "username"
+    And FILL "password"
+    And CLICK "loginBtn"
+    And CLICK "productItem"
+    And CLICK "addToCartBtn"
+    And CLICK "cartLink"
+    Then VERIFY TEXT "Your Cart"
+    And CLICK "checkoutBtn"
+    When FILL "firstName" WITH "John"
+    And FILL "lastName" WITH "Doe"
+    And FILL "postalCode" WITH "12345"
+    And CLICK "continueBtn"
+    And CLICK "finishBtn"
+    Then VERIFY TEXT "THANK YOU"
