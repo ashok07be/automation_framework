@@ -6,6 +6,9 @@ import TestDataReader from '../readers/TestDataReader.js';
 import ActionManager from '../actions/ActionManager.js';
 import configManager from '../config/ConfigurationManager.js';
 import logger from '../utils/Logger.js';
+import { runCucumber } from '@cucumber/cucumber/api';
+import path from 'path';
+import fs from 'fs';
 
 // Set default timeout
 setDefaultTimeout(60 * 1000);
@@ -396,6 +399,78 @@ When(/^CLOSE PDF AND GO BACK$/, async function () {
     throw error;
   }
 });
+
+/**
+ * Step to execute another feature file or TXT file with steps and return control
+ * Usage: EXECUTE FEATURE "filename" (supports .feature or .txt)
+ */
+When(/^EXECUTE FEATURE "([^"]*)"$/, async function (featureFile) {
+  try {
+    logger.info(`[Step] EXECUTE FEATURE "${featureFile}"`);
+
+    const filePath = path.join(process.cwd(), 'features', featureFile);
+    const isTxt = featureFile.endsWith('.txt');
+    const isFeature = featureFile.endsWith('.feature');
+
+    if (isFeature) {
+      // Run as full feature file (separate context)
+      const config = {
+        paths: [filePath],
+        import: ['src/steps/**/*.js'],
+        format: ['progress'],
+        formatOptions: { snippetInterface: 'async-await' },
+        require: ['src/steps/stepDefinitions.js'],
+        worldParameters: {},
+      };
+
+      const { success } = await runCucumber(config);
+      if (!success) {
+        throw new Error(`Child feature "${featureFile}" failed to execute successfully`);
+      }
+    } else if (isTxt) {
+      // Parse and execute TXT file steps in current context
+      await executeTxtSteps.call(this, filePath);
+    } else {
+      throw new Error(`Unsupported file type for "${featureFile}". Use .feature or .txt`);
+    }
+
+    logger.info(`Successfully executed: ${featureFile}`);
+
+  } catch (error) {
+    logger.error(`Failed to execute ${featureFile}: ${error.message}`);
+    throw error;
+  }
+});
+
+/**
+ * Helper to execute steps from a TXT file in the current context
+ * TXT format: Each line is a step like "FILL email" or "CLICK loginBtn"
+ */
+async function executeTxtSteps(txtFilePath) {
+  const content = fs.readFileSync(txtFilePath, 'utf8');
+  const lines = content.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('#'));
+
+  for (const line of lines) {
+    const parts = line.split(/\s+/);
+    const action = parts[0].toUpperCase();
+    const element = parts[1];
+    const value = parts.slice(2).join(' ') || null;
+
+    logger.info(`Executing TXT step: ${action} ${element} ${value || ''}`);
+
+    // Resolve locator
+    const locatorObj = resolveLocator(this.locatorReader, element);
+
+    // Get value from test data if not provided
+    let finalValue = value;
+    if (!finalValue) {
+      finalValue = this.testDataReader.getTestData(this.currentScenarioName, element);
+    }
+
+    // Execute the action
+    await this.actionManager.executeAction(action, locatorObj, finalValue);
+  }
+}
 
 /**
  * Advanced step with locator and value
