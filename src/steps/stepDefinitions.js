@@ -320,6 +320,84 @@ When(/^REFRESH THE PAGE$/, async function () {
 });
 
 /**
+ * Step to click a button that opens a new window (e.g., PDF viewer) and switch context
+ * Usage: OPEN PDF FROM "elementName"
+ */
+When(/^OPEN PDF FROM "([^\"]*)"$/, async function (elementName) {
+  try {
+    logger.info(`[Step] OPEN PDF FROM "${elementName}"`);
+
+    // Wait for the new page to open
+    const newPagePromise = this.webContextManager.getContext().waitForEvent('page');
+
+    const locatorObj = resolveLocator(this.locatorReader, elementName);
+    await this.actionManager.clickAction.click(locatorObj);
+
+    const newPage = await newPagePromise;
+    await newPage.waitForLoadState('load');
+
+    logger.info(`New window opened: ${newPage.url()}`);
+
+    // Keep reference to the original page so we can return to it later
+    this.webContextManager.previousPage = this.page;
+
+    // Switch framework context to the new page
+    this.webContextManager.page = newPage;
+    this.page = newPage;
+    this.actionManager = new ActionManager(newPage);
+
+  } catch (error) {
+    logger.error(`Failed to open PDF window: ${error.message}`);
+    throw error;
+  }
+});
+
+/**
+ * Step to verify the current page URL contains a given string (useful for PDFs)
+ * Usage: VERIFY PDF URL CONTAINS "expected"
+ */
+Then(/^VERIFY PDF URL CONTAINS "([^\"]*)"$/, async function (expected) {
+  try {
+    logger.info(`[Step] VERIFY PDF URL CONTAINS "${expected}"`);
+    const url = this.page.url();
+    expect(url).toContain(expected);
+  } catch (error) {
+    logger.error(`Failed to verify PDF URL: ${error.message}`);
+    throw error;
+  }
+});
+
+/**
+ * Step to close the current PDF window and return to the previous page
+ * Usage: CLOSE PDF AND GO BACK
+ */
+When(/^CLOSE PDF AND GO BACK$/, async function () {
+  try {
+    logger.info(`[Step] CLOSE PDF AND GO BACK`);
+
+    const previousPage = this.webContextManager.previousPage;
+    if (!previousPage) {
+      throw new Error('No previous page stored. make sure you called OPEN PDF FROM first.');
+    }
+
+    // Close the current page (PDF)
+    await this.page.close();
+
+    // Restore context to the original page
+    this.webContextManager.page = previousPage;
+    this.page = previousPage;
+    this.actionManager = new ActionManager(previousPage);
+
+    // Clear stored reference
+    this.webContextManager.previousPage = null;
+
+  } catch (error) {
+    logger.error(`Failed to close PDF and go back: ${error.message}`);
+    throw error;
+  }
+});
+
+/**
  * Advanced step with locator and value
  * Usage: PERFORM "CLICK" ON PAGE "PAGENAME" ELEMENT "ELEMENTNAME"
  */
