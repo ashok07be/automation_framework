@@ -1,0 +1,5 @@
+  Scenario: Navigate to dashboard
+    Given NAVIGATE TO "/dashboard"
+    When CLICK "menuBtn"
+    Then VERIFY ELEMENT "dashboardHeader" IS VISIBLE
+    And VERIFY TEXT "Dashboard Overview"

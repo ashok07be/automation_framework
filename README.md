@@ -68,6 +68,21 @@ automation_framework/
    npm test
    ```
 
+6. **Generate reports and open**
+   ```bash
+   npm run test:report
+   ```
+
+7. **Generate reports only**
+   ```bash
+   npm run test:generate-report
+   ```
+
+8. **Open existing report**
+   ```bash
+   npm run open:report
+   ```
+
 ## 📊 Locators Excel File Structure
 
 Create `data/locators.xlsx` with the following structure:
@@ -259,12 +274,69 @@ Logs are stored in `logs/` directory:
 
 Log levels: `debug`, `info`, `warn`, `error`
 
-## 🛠️ Adding New Feature Files
+## 🎬 Dynamic Scenario Builder
 
-1. Create a new `.feature` file in `features/` directory
-2. Add corresponding test data in `testdata.xlsx` if needed
-3. Ensure all elements are defined in `locators.xlsx`
-4. Run tests: `npm test`
+The framework supports dynamic scenario generation using Excel-based scenario builder. Build complex test scenarios by combining reusable functionality variants.
+
+### Scenario Builder Excel Structure
+
+Create `data/scenario_builder.xlsx` with the following structure:
+
+| ScenarioName | Status | Func1 | Variant1 | Func2 | Variant2 | Func3 | Variant3 |
+|--------------|--------|-------|----------|-------|----------|-------|----------|
+| Login Flow   | Run    | Login | Basic    |       |          |       |          |
+| Full Journey | Run    | Login | Basic    | Dashboard | Admin | Profile | Edit     |
+| Error Test   | Skip   | Login | Invalid  |       |          |       |          |
+
+**Status Column Values:**
+- `Run` - Include this scenario in execution
+- `Skip` - Skip this scenario
+
+### Variant Text Files
+
+Create text files in `data/variants/` directory with naming pattern: `{Function}_{Variant}.txt`
+
+Example: `Login_Basic.txt`, `Dashboard_Admin.txt`
+
+Each file contains Gherkin steps:
+
+```gherkin
+  Scenario: Login functionality
+    Given NAVIGATE TO "/login"
+    When FILL "username"
+    And FILL "password"
+    And CLICK "loginBtn"
+    Then VERIFY TEXT "Welcome"
+```
+
+### Running Dynamic Scenarios
+
+```bash
+# Generate and run scenarios marked as 'Run' in Excel
+npm run scenarios:run
+
+# Only generate feature files (don't run)
+npm run scenarios:generate
+```
+
+### Configuration
+
+Update `.env` file for scenario builder paths:
+
+```env
+SCENARIO_BUILDER_PATH=./data/scenario_builder.xlsx
+VARIANTS_PATH=./data/variants/
+```
+
+Generated feature files are saved in `features/generated/` directory.
+
+### How It Works
+
+1. **Excel Parsing**: Reads scenario builder Excel and identifies scenarios with `Status = "Run"`
+2. **Variant Assembly**: For each scenario, combines the specified function variants
+3. **Feature Generation**: Creates feature files by concatenating the content from variant text files
+4. **Test Execution**: Runs the generated feature files using Cucumber
+5. **Report Generation**: Generates HTML/JSON reports and opens them automatically
 
 ## 📚 Best Practices
 

@@ -21,24 +21,25 @@ class ConfigurationManager {
       // File paths
       locatorFilePath: process.env.LOCATOR_FILE_PATH || './data/locators.xlsx',
       testDataPath: process.env.TEST_DATA_PATH || './data/testdata.xlsx',
+      scenarioBuilderPath: process.env.SCENARIO_BUILDER_PATH || './data/scenario_builder.xlsx',
+      variantsPath: process.env.VARIANTS_PATH || './data/variants/',
       
       // Logging
       logLevel: process.env.LOG_LEVEL || 'info',
       logDir: process.env.LOG_DIR || './logs',
     };
 
-    logger.info('Configuration loaded', { config: this.config });
+    // Note: Logging is done after logger is properly initialized
   }
 
   /**
-   * Get a configuration value by key
-   * @param {string} key - Configuration key
-   * @param {*} defaultValue - Default value if key not found
-   * @returns {*} Configuration value
+   * Load configuration (for async initialization)
+   * @returns {Promise<void>}
    */
-  get(key, defaultValue = null) {
-    const value = this.config[key];
-    return value !== undefined ? value : defaultValue;
+  async load() {
+    // Configuration is already loaded in constructor
+    // This method can be used for future async loading
+    logger.info('Configuration loaded', { config: this.config });
   }
 
   /**

@@ -1,0 +1,6 @@
+  Scenario: Login with invalid credentials
+    Given NAVIGATE TO "/login"
+    When FILL "username" WITH "invaliduser"
+    And FILL "password" WITH "wrongpass"
+    And CLICK "loginBtn"
+    Then VERIFY TEXT "Invalid credentials"

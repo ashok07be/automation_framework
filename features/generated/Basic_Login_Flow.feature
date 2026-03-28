@@ -1,0 +1,10 @@
+Feature: Basic Login Flow
+
+  # Login - Basic
+  Scenario: Login with valid credentials
+    Given NAVIGATE TO "/login"
+    When FILL "username"
+    And FILL "password"
+    And CLICK "loginBtn"
+    Then VERIFY TEXT "Welcome"
+

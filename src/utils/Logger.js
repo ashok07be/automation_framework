@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const logDir = path.join(__dirname, '../logs');
+const logDir = path.join(__dirname, '../../logs');
 
 // Create logs directory if it doesn't exist
 if (!fs.existsSync(logDir)) {
